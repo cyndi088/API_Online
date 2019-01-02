@@ -77,7 +77,7 @@ def insert_inspection(data):
     mo_db = client[MONGO_DB]
     coll = mo_db[MONGO_COLL]
     coll.insert_one(data)
-    obj = ElasticObj("106.14.176.62:27017", "zhejiang", "sheng", "zhejiang", "sheng", "http://http://47.98.210.22:9200")
+    obj = ElasticObj("106.14.176.62:27017", "zhejiang", "sheng", "zhejiang", "sheng", "http://47.98.210.22:9200")
     obj.create_index()
     obj.bulk_Index_Data()
     ra1 = RelationAll()
