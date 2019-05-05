@@ -287,6 +287,7 @@ class MiddleTable(object):
         else:
             return datetime.now()
 
+
 mt = MiddleTable()
 mt.open_sql('yfhunt', 'zhejiang', 'sheng')
 mt.input_sql()
