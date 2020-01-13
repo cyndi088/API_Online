@@ -6,35 +6,43 @@ from pymongo import MongoClient
 from dateutil import parser
 
 
-
 class MiddleTable(object):
 
     def __init__(self):
+        """预发mysql"""
         self.mysql_host = "192.168.10.121"
         self.mysql_user = 'hzyg'
         self.mysql_password = '@hzyq20180426..'
+        """线上mysql"""
         # self.mysql_host = "120.55.45.141"
         # self.mysql_user = 'hzyg2018'
         # self.mysql_password = 'hzyq@..2018'
+        """线上mongodb"""
         self.MONGO_HOST = '106.14.176.62'
-        # self.MONGO_HOST = "localhost"
         self.MONGO_PORT = 27017
+        # self.MONGO_USER = ''
+        # self.PSW = ''
+        """本地mongodb"""
+        # self.MONGO_HOST = "localhost"
+        # self.MONGO_PORT = 27017
         # self.MONGO_USER = ''
         # self.PSW = ''
 
     def open_sql(self, ms_db, mo_db, mo_coll):
+        """连接mysql"""
         self.link = pymysql.connect(self.mysql_host, self.mysql_user, self.mysql_password, ms_db)
         self.link.set_charset('utf8')
-        self.cursor = self.link.cursor()
+        self.cursor = self.link.cursor()  # 生成游标对象
+        """连接mongodb"""
         self.client = MongoClient(host=self.MONGO_HOST, port=self.MONGO_PORT)
-        self.mo_db = self.client[mo_db]
-        self.coll = self.mo_db[mo_coll]
+        self.mo_db = self.client[mo_db]  # 数据库
+        self.coll = self.mo_db[mo_coll]  # 集合
 
     def input_sql(self):
         sql = "select * from testing_security"
         self.cursor.execute(sql)
-        allData = self.cursor.fetchall()
-        for data in allData:
+        all_data = self.cursor.fetchall()
+        for data in all_data:
             # print(data)
             item = {}
             if data[3]:
@@ -74,7 +82,7 @@ class MiddleTable(object):
                     else:
                         item["fl"] = "/"
                         item["flId"] = 82
-                elif data[14] == None:
+                elif data[14] is None:
                     item["ggh"] = "/"
                     if data[15]:
                         item["ggrq"] = self.str_time(data[15])
@@ -103,7 +111,7 @@ class MiddleTable(object):
                 if data[15]:
                     item["createDate"] = self.str_time(data[15])
                 else:
-                    if item["ggrq"] == None:
+                    if item["ggrq"] is None:
                         item["ggrq"] = datetime.now()
                         item["createDate"] = item["ggrq"]
                     else:
@@ -148,8 +156,8 @@ class MiddleTable(object):
         self.link.close()
 
     @staticmethod
-    def zoning(str):
-        if str == None or str == "/":
+    def zoning(st):
+        if st is None or st == "/":
             return 0
         else:
             mysql_host = "192.168.10.121"
@@ -161,21 +169,21 @@ class MiddleTable(object):
             cursor = link.cursor()
             sql1 = "select region_name from region r where r.parent_id in (select r.region_id from region r where r.parent_id=(select r.region_id from region r where r.region_name='浙江省'))"
             cursor.execute(sql1)
-            allData1 = cursor.fetchall()
+            all_data1 = cursor.fetchall()
             sql2 = "select region_name from region r where r.parent_id=(select r.region_id from region r where r.region_name='浙江省')"
             cursor.execute(sql2)
-            allData2 = cursor.fetchall()
+            all_data2 = cursor.fetchall()
             i = 0
             stp = []
-            while i < len(allData1):
+            while i < len(all_data1):
                 j = 0
-                while j < len(allData1[i]):
-                    if allData1[i][j][:-1] in str:
-                        stp.append(allData1[i][j])
+                while j < len(all_data1[i]):
+                    if all_data1[i][j][:-1] in str:
+                        stp.append(all_data1[i][j])
                         sql3 = "select region_id from region r where r.region_name='%s'" % stp[0]
                         cursor.execute(sql3)
-                        allData3 = cursor.fetchall()
-                        region_id = int(allData3[0][0])
+                        all_data3 = cursor.fetchall()
+                        region_id = int(all_data3[0][0])
                         return region_id
                         break
                     else:
@@ -183,15 +191,15 @@ class MiddleTable(object):
                 i += 1
             if not stp:
                 m = 0
-                while m < len(allData2):
+                while m < len(all_data2):
                     n = 0
-                    while n < len(allData2[m]):
-                        if allData2[m][n][:-1] in str:
-                            stp.append(allData2[m][n])
+                    while n < len(all_data2[m]):
+                        if all_data2[m][n][:-1] in str:
+                            stp.append(all_data2[m][n])
                             sql4 = "select region_id from region r where r.region_name='%s'" % stp[0]
                             cursor.execute(sql4)
-                            allData4 = cursor.fetchall()
-                            region_id = int(allData4[0][0])
+                            all_data4 = cursor.fetchall()
+                            region_id = int(all_data4[0][0])
                             return region_id
                             break
                         else:
@@ -203,8 +211,8 @@ class MiddleTable(object):
                 return 1
 
     @staticmethod
-    def str_time(str):
-        return parser.parse(str)
+    def str_time(st):
+        return parser.parse(st)
 
     @staticmethod
     def rwly(num):
@@ -221,7 +229,7 @@ class MiddleTable(object):
 
     @staticmethod
     def fl(name):
-        if name != None:
+        if name is not None:
             mysql_host = "192.168.10.121"
             mysql_user = 'hzyg'
             mysql_password = '@hzyq20180426..'
@@ -231,9 +239,9 @@ class MiddleTable(object):
             cursor = link.cursor()
             sql = "select sys_data_group_id from sys_data_item where key_value='%s'" % name
             cursor.execute(sql)
-            allData = cursor.fetchone()
-            if allData:
-                return allData[0]
+            all_data = cursor.fetchone()
+            if all_data:
+                return all_data[0]
             else:
                 return 82
         else:
@@ -247,7 +255,8 @@ class MiddleTable(object):
                     stp = str[:10]
                     ss1 = parser.parse(stp)
                     return ss1
-                except:
+                except Exception as e:
+                    print('time_format1:%s' % e)
                     return datetime.now()
             elif "." in str:
                 ls = str.split(".")
@@ -256,7 +265,8 @@ class MiddleTable(object):
                         stp = time.strptime(str, '%Y.%m.%d')
                         ss2 = parser.parse(time.strftime("%Y-%m-%d", stp))
                         return ss2
-                    except:
+                    except Exception as e:
+                        print('time_format2:%s' % e)
                         return datetime.now()
                 elif len(ls) == 2:
                     str = ls[0]
@@ -265,7 +275,8 @@ class MiddleTable(object):
                         try:
                             ss3 = parser.parse(stp)
                             return ss3
-                        except:
+                        except Exception as e:
+                            print('time_format3:%s' % e)
                             return datetime.now()
                     else:
                         return datetime.now()
@@ -278,7 +289,8 @@ class MiddleTable(object):
                         stp = ls[0] + "-" + ls[1] + "-" + ls[2][:2]
                         ss4 = parser.parse(stp)
                         return ss4
-                    except:
+                    except Exception as e:
+                        print('time_format4:%s' % e)
                         return datetime.now()
                 else:
                     return datetime.now()
@@ -292,10 +304,3 @@ mt = MiddleTable()
 mt.open_sql('yfhunt', 'zhejiang', 'sheng')
 mt.input_sql()
 mt.close_sql()
-
-
-
-
-
-
-
